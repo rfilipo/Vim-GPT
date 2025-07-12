@@ -90,7 +90,8 @@ function! GPTDoc()
 
   echo "💬 GPT is documenting " . l:filetype . " code..."
 
-  let l:cmd = 'python3 ~/.vim/pack/plugins/start/vim-gpt/python/gpt_client.py "' . shellescape(l:prompt) . '"'
+  let l:cmd = 'python3 ~/.vim/pack/plugins/start/vim-gpt/python/gpt_client.py "' . shellescape(l:prompt) . '" ' . shellescape(l:filetype)
+  " let l:cmd = 'python3 ~/.vim/pack/plugins/start/vim-gpt/python/gpt_client.py "' . shellescape(l:prompt) . '"'
 
   " Execute GPT
   try
@@ -188,7 +189,9 @@ function! GPTInlineComplete()
   let l:prompt = "Complete the following " . l:filetype . " code:\n\n" . l:line
   echo "💬 GPT is generating inline completion..."
 
-  let l:cmd = 'python3 ~/.vim/pack/plugins/start/vim-gpt/python/gpt_client.py "' . shellescape(l:prompt) . '"'
+  " let l:cmd = 'python3 ~/.vim/pack/plugins/start/vim-gpt/python/gpt_client.py "' . shellescape(l:prompt) . '"'
+  let l:cmd = 'python3 ~/.vim/pack/plugins/start/vim-gpt/python/gpt_client.py "' . shellescape(l:prompt) . '" ' . shellescape(l:filetype)
+
 
   try
     let l:response = system(l:cmd)

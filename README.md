@@ -1,140 +1,136 @@
-# ✨ Vim-GPT — Classic Vim AI Assistant
+# Vim-GPT 🧠✨
 
-Vim-GPT is a powerful AI integration for **classic Vim** (not Neovim) that brings the capabilities of OpenAI (ChatGPT) directly into your editor. It supports code documentation, inline completion, and interactive prompts — with native Vimscript and Python integration.
-
-🧠 Powered by OpenAI's GPT models.  
-⚙️ Designed for speed, extensibility, and full keyboard-driven control.
+AI-Powered Assistance Directly in Vim or Neovim using OpenAI's GPT API
 
 ---
 
-## 📦 Features
+## 📦 Installation
 
-- ✅ `:GPTDoc` – Insert AI-generated documentation above selected code (supports mouse and visual selection)
-- ✅ `:GPTComplete` – Complete selected code blocks or prompts
-- ✅ Insert-mode trigger `<C-Space>` for inline code completion
-- ✅ Language-aware prompts with automatic comment formatting
-- ✅ Logs all interactions to:
-  - Markdown files (`doc/logs/YYYY-MM-DD_HH-MM-SS.md`)
-  - SQLite database (`doc/gpt_log.db`)
+You can install Vim-GPT with a one-liner:
 
----
+### Using `curl`
 
-## Advise
-
-## 🛠 Installation
-
-Requires:
-
-- Vim 8.0+ (Classic Vim, not Neovim)
-- Python 3.x
-- OpenAI Python SDK (`pip install openai`)
-
-### Manual Install
-
-Clone the source:
-
-```sh
-git clone https://github.com/rfilipo/Vim-GPT.git
-mkdir -p ~/.vim/pack/plugins/start
-cp -R ./Vim-GPT/vim-gpt ~/.vim/pack/plugins/start
+```bash
+curl -s https://raw.githubusercontent.com/rfilipo/Vim-GPT/main/install.sh | bash
 ```
 
-### API Key
+### Using `wget`
 
-Create a file with your OpenAI API key:
-
-```sh
-echo "sk-..." > ~/.vim/pack/plugins/start/vim-gpt/config/api_key
-chmod 600 ~/.vim/pack/plugins/start/vim-gpt/config/api_key
+```bash
+wget -qO- https://raw.githubusercontent.com/rfilipo/Vim-GPT/main/install.sh | bash
 ```
 
----
+This script installs:
 
-## ⚡ Usage
+* System dependencies (build tools, SSL, SQLite, etc.)
+* `pyenv` and the latest stable Python
+* OpenAI's Python SDK
+* This plugin under `~/.vim/pack/plugins/start/vim-gpt` (or for Neovim, compatible path)
+* Your API key in: `~/.vim/pack/plugins/start/vim-gpt/config/apikey`
 
-### 🧾 `:GPTDoc`
+Also adds the following to `~/.bashrc` (and `.zshrc` if needed):
 
-Generate documentation for selected code.
+```bash
+export PYENV_ROOT="$HOME/.pyenv"
+export PATH="$PYENV_ROOT/bin:$PATH"
+if command -v pyenv 1>/dev/null 2>&1; then
+  eval "$(pyenv init -)"
+fi
+```
+
+For **macOS users**, `brew` is used to install required dependencies.
+
+For **Neovim users**, the plugin works just like in Vim. It uses the same paths and logic.
+
+### ✅ Vim-Plug (Optional)
+
+If you prefer Vim-Plug, add this to your `.vimrc` or `init.vim`:
 
 ```vim
-# Select code (Visual or with mouse)
-:GPTDoc
+Plug 'rfilipo/Vim-GPT', { 'rtp': 'vim-gpt' }
 ```
 
-* Inserts language-formatted comment blocks above the selected code.
-* Supports: `php`, `js`, `ts`, `python`, `c`, `cpp`, `java`, `html`, `css`, `go`, `rust`, and more.
+Then run `:PlugInstall` and run the install script manually for dependencies:
 
----
-
-### ✍️ `:GPTComplete`
-
-Complete code snippets or prompts.
-
-```vim
-# Select code or type a prompt
-:GPTComplete "Write a Python function that calculates factorial"
-```
-
-* Inserts GPT’s response below the selected lines or current line.
-
----
-
-### ⌨️ Insert Mode Completion (`<C-Space>`)
-
-Trigger inline completions while coding.
-
-```vim
-def is_prime(n):<C-Space>
-```
-
-To ensure terminal support, add to `.vimrc`:
-
-```vim
-map <Nul> <C-Space>
-map! <Nul> <C-Space>
-inoremap <C-Space> <C-N>
+```bash
+curl -s https://raw.githubusercontent.com/rfilipo/Vim-GPT/main/install.sh | bash
 ```
 
 ---
 
-## 🗂 Logs
+## ⚙️ Usage
 
-Every interaction is logged automatically:
+Once installed, launch Vim or Neovim and use the following commands in **Normal** or **Visual** mode:
 
-* **Markdown logs**: `~/.vim/pack/plugins/start/vim-gpt/doc/logs/*.md`
-* **Database**: `~/.vim/pack/plugins/start/vim-gpt/doc/gpt_log.db`
+### 🔸 `:GPTDoc`
 
----
+Generate documentation for the selected code or current line.
 
-## 📚 Commands Summary
+### 🔸 `:GPTExplain`
 
-| Command        | Description                                      |
-| -------------- | ------------------------------------------------ |
-| `:GPTDoc`      | Add AI-generated documentation above code block  |
-| `:GPTComplete` | Generate code or content from a selection/prompt |
-| `<C-Space>`    | Inline code completion in Insert mode            |
+Get an explanation of the selected code snippet or current line.
 
----
+### 🔸 `:GPTRefactor`
 
-## 🧠 Roadmap
+Ask GPT to refactor or improve the selected code.
 
-* [ ] `:GPTLogOpen` and `:GPTLogSearch` utilities
-* [ ] Floating preview support (GVim/terminal UI)
-* [ ] Caching and offline prompt re-use
-* [ ] Refactor, rename, explain, or test selected code
-* [ ] Seamless Git/Gist integration
+### 🔸 `:GPTComplete`
+
+(Coming soon) Autocompletes code using AI suggestions.
 
 ---
 
-## 🤝 Credits
+## 🔑 API Key
 
-Created by [Monsenhor Filipo](https://github.com/kobkob) with the support of ChatGPT.
-OpenAI API usage and ideas powered by community inspiration.
+Your API key must be placed at:
+
+```bash
+~/.vim/pack/plugins/start/vim-gpt/config/apikey
+```
+
+The installer will prompt you to paste it the first time.
+
+To generate an API key:
+
+* Visit [https://platform.openai.com/account/api-keys](https://platform.openai.com/account/api-keys)
 
 ---
 
-## 🛡 License
+## 📁 Plugin Structure
 
-MIT — free to use, adapt, and contribute.
+```
+vim-gpt/
+├── autoload/
+│   └── gpt.vim          # Vim commands and logic
+├── python/
+│   └── gpt_backend.py   # Python script for OpenAI API requests
+├── config/
+│   └── apikey           # Your OpenAI API key (not committed)
+├── README.md
+```
 
+---
+
+## 🧪 Requirements
+
+### OS:
+
+* Debian/Ubuntu Linux, macOS (for installer script)
+
+### Tools Installed:
+
+* Python (via `pyenv`)
+* `pip` with `openai`
+* Vim (8.0+) or Neovim
+
+---
+
+## 💬 Feedback / Contributions
+
+PRs are welcome at:
+[https://github.com/rfilipo/Vim-GPT](https://github.com/rfilipo/Vim-GPT)
+
+---
+
+Crafted with 🧠 by @rfilipo and GPT ✨
 

@@ -108,7 +108,7 @@ Generate documentation for the selected code or current line.
 
 ### 🔸 `:GPTComplete`
 
-Run with <Ctrl> Space in edit mode.
+Run with *Control + Space* in edit mode.
 
 
 ## Future commands (Comming soon):

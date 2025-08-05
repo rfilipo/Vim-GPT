@@ -56,15 +56,62 @@ Then run `:PlugInstall` and run the install script manually for dependencies:
 curl -s https://raw.githubusercontent.com/rfilipo/Vim-GPT/main/install.sh | bash
 ```
 
+## 🚀 Installation on Debian
+
+### 📦 Recommended: Using the `.deb` package (Debian/Ubuntu)
+
+1. Build the `.deb` package:
+
+```bash
+./build_deb.sh
+```
+
+2. Install the package:
+
+```
+sudo dpkg -i vim-gpt_1.0.0_all.deb
+```
+
+3. The plugin will be installed under:
+
+```
+/usr/share/vim-gpt/
+```
+4. Link the plugin to Vim:
+
+```
+mkdir -p ~/.vim/pack/plugins/start/
+ln -s /usr/share/vim-gpt ~/.vim/pack/plugins/start/vim-gpt
+```
+
 ---
 
 ## ⚙️ Usage
 
 Once installed, launch Vim or Neovim and use the following commands in **Normal** or **Visual** mode:
 
+### 🔸 `:GPT`
+
+Prompt GPT. If the result is a Vim command it asks to run it.
+
+### 🔸 `:GPTAskFile`
+
+Show files in the current dir ans asks what to do.
+
+### 🔸 `:GPTCommandAsk`
+
+Asks for a system command and what to do with the result.
+
 ### 🔸 `:GPTDoc`
 
 Generate documentation for the selected code or current line.
+
+### 🔸 `:GPTComplete`
+
+Run with <Ctrl> Space in edit mode.
+
+
+## Future commands (Comming soon):
 
 ### 🔸 `:GPTExplain`
 
@@ -74,11 +121,16 @@ Get an explanation of the selected code snippet or current line.
 
 Ask GPT to refactor or improve the selected code.
 
-### 🔸 `:GPTComplete`
-
-(Coming soon) Autocompletes code using AI suggestions.
-
 ---
+
+## ⚙️  Configuration
+
+Set your OpenAI API key:
+
+```bash
+mkdir -p ~/.vim/pack/plugins/start/vim-gpt/config/
+echo "sk-xxxxx..." > ~/.vim/pack/plugins/start/vim-gpt/config/apikey
+```
 
 ## 🔑 API Key
 

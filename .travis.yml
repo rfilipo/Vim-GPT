@@ -1,0 +1,117 @@
+language: python
+
+# Python versions to test with
+python:
+  - "3.8"
+  - "3.9"
+  - "3.10"
+  - "3.11"
+
+# Operating systems
+os:
+  - linux
+
+dist: focal
+
+# Cache dependencies for faster builds
+cache:
+  - pip
+  - directories:
+    - $HOME/.cache/pip
+
+# Environment variables
+env:
+  global:
+    - DEBIAN_FRONTEND=noninteractive
+
+# Install system dependencies
+before_install:
+  - sudo apt-get update -qq
+  - sudo apt-get install -y vim sqlite3 python3-dev python3-pip
+  - python --version
+  - python3 --version
+
+# Install Python dependencies
+install:
+  - pip install --upgrade pip
+  - pip install pytest
+  # Note: OpenAI package is optional for basic tests
+  - pip install openai || echo "OpenAI package not available, will skip related tests"
+
+# Pre-test setup
+before_script:
+  - chmod +x t/*.t
+  - chmod +x t/run_tests.sh
+  - ls -la t/
+
+# Run tests
+script:
+  - bash t/run_tests.sh
+
+# Test matrix for additional configurations
+jobs:
+  include:
+    # Test on Ubuntu 20.04 with PHP 8.1 (per user preference)
+    - name: "Ubuntu 20.04 with PHP 8.1"
+      os: linux
+      dist: focal
+      language: python
+      python: "3.9"
+      before_install:
+        - sudo apt-get update -qq
+        - sudo apt-get install -y vim sqlite3 python3-dev python3-pip
+        # Install PHP 8.1 as per user preference
+        - sudo apt-get install -y software-properties-common
+        - sudo add-apt-repository -y ppa:ondrej/php
+        - sudo apt-get update -qq
+        - sudo apt-get install -y php8.1 php8.1-cli
+        - php --version
+        - python --version
+
+    # Test installation scripts
+    - name: "Installation Script Test"
+      os: linux
+      dist: focal
+      language: python
+      python: "3.9"
+      script:
+        - bash -n install.sh
+        - bash -n build_deb.sh
+        - echo "Installation scripts have valid syntax"
+
+    # Test on macOS (if needed)
+    - name: "macOS Test"
+      os: osx
+      osx_image: xcode12.2
+      language: python
+      python: "3.9"
+      before_install:
+        - brew update
+        - brew install vim python3 sqlite3
+      script:
+        - bash t/run_tests.sh
+
+# Notification settings
+notifications:
+  email:
+    recipients:
+      - monsenhor@example.com
+    on_success: change
+    on_failure: always
+
+# Branch configuration
+branches:
+  only:
+    - main
+    - master
+    - develop
+    - /^release-.*$/
+
+# After success
+after_success:
+  - echo "All tests completed successfully!"
+
+# After failure
+after_failure:
+  - echo "Tests failed. Check the logs above."
+  - cat /tmp/test-*.log || echo "No additional logs found"

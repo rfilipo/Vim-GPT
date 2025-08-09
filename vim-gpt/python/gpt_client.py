@@ -1,9 +1,11 @@
 import os
+import sys
 import hashlib
 import sqlite3
 import argparse
 from datetime import datetime
 from openai import OpenAI
+from difflib import get_close_matches
 
 # Path to OpenAI API key
 def read_api_key():
@@ -13,11 +15,15 @@ def read_api_key():
 
 client = OpenAI(api_key=read_api_key())
 
+def hash_prompt(prompt):
+    return hashlib.sha256(prompt.strip().lower().encode()).hexdigest()
+
 # Save logs in both Markdown and SQLite
 def save_logs(prompt, result, filetype):
     timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
     log_dir = os.path.expanduser("~/.vim/pack/plugins/start/vim-gpt/doc/logs")
     os.makedirs(log_dir, exist_ok=True)
+    prompt_hash = hash_prompt(prompt)
 
     # Markdown log
     md_path = os.path.join(log_dir, f"{timestamp}.md")
@@ -43,12 +49,71 @@ def save_logs(prompt, result, filetype):
         None,
         timestamp,
         filetype,
-        hashlib.sha256(prompt.encode()).hexdigest(),
+        #hashlib.sha256(prompt.encode()).hexdigest(),
+        prompt_hash,
         prompt,
         result
     ))
     conn.commit()
     conn.close()
+
+# Check if the prompt was used before
+def check_cached_response(prompt_hash, filetype=None):
+    db_path = os.path.expanduser("~/.vim/pack/plugins/start/vim-gpt/doc/gpt_log.db")
+    conn = sqlite3.connect(db_path)
+    cursor = conn.cursor()
+
+    if filetype:
+        cursor.execute("""
+            SELECT response FROM logs
+            WHERE prompt_hash = ? AND filetype = ?
+            ORDER BY timestamp DESC LIMIT 1
+        """, (prompt_hash, filetype))
+    else:
+        cursor.execute("""
+            SELECT response FROM logs
+            WHERE prompt_hash = ?
+            ORDER BY timestamp DESC LIMIT 1
+        """, (prompt_hash,))
+    
+    row = cursor.fetchone()
+    conn.close()
+
+    if row:
+        return row[0]
+    return None
+
+# Check if exists a close match
+def find_fuzzy_response(prompt, filetype=None, threshold=0.92):
+    db_path = os.path.expanduser("~/.vim/pack/plugins/start/vim-gpt/doc/gpt_log.db")
+    conn = sqlite3.connect(db_path)
+    cursor = conn.cursor()
+
+    if filetype:
+        cursor.execute("""
+            SELECT prompt, response FROM logs
+            WHERE filetype = ?
+            ORDER BY timestamp DESC LIMIT 1000
+        """, (filetype,))
+    else:
+        cursor.execute("""
+            SELECT prompt, response FROM logs
+            ORDER BY timestamp DESC LIMIT 1000
+        """)
+
+    rows = cursor.fetchall()
+    conn.close()
+
+    prompts = [row[0] for row in rows]
+    matches = get_close_matches(prompt.strip().lower(), prompts, n=1, cutoff=threshold)
+
+    if matches:
+        match = matches[0]
+        for prompt_text, response in rows:
+            if prompt_text == match:
+                return response
+    return None
+
 
 # Call GPT
 def query_gpt(prompt):
@@ -77,6 +142,19 @@ def main():
             return
 
     prompt = args.question
+
+    # Search for a log with this prompt
+    prompt_hash = hash_prompt(prompt)    
+    cached = check_cached_response(prompt_hash, args.filetype)
+    if cached:
+        print("💬 [cached]\n" + cached)
+        sys.exit(0)
+
+    # Search for a log with a close prompt
+    fuzzy = find_fuzzy_response(prompt, args.filetype)
+    if fuzzy:
+        print("💬 [fuzzy matched]\n" + fuzzy)
+        sys.exit(0)
 
     # If a file is provided, add its contents to the prompt
     if args.file and os.path.isfile(args.file):

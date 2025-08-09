@@ -2,6 +2,8 @@
 
 AI-Powered Assistance Directly in Vim or Neovim using OpenAI's GPT API
 
+![VIM-GPT](VIM-GPT_200.png "VIM-GPT")
+
 ---
 
 ## 📦 Installation
